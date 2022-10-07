@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<script type="text/javascript">
+
+async function checkData(){
+  for (var i = 0; i < arguments.length; i++) {
+    if(arguments[i] === ""){
+      return false;
+    }
+  }
+  return true;
+}
+
+async function sendMessage() {
+    let name = document.getElementById("name").value;
+    let message = document.getElementById("message").textContent;
+
+    let userData = {
+      name: name,
+      message: message
+};
+   if (await checkData(name, message) === false){
+      window.alert("Необходимо заполнить все данные");
+      return false;
+    }
+
+  let response = await fetch('', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json;charset=utf-8'
+  },
+  body: JSON.stringify(userData)
+});
+
+  if (response.ok) {
+    let result = await response.json();
+    document.getElementById("message").textContent = "";
+    document.getElementById('messagePlace').textContent = "";
+     for (var i = 0; i < result.length; i++) {
+        document.getElementById('messagePlace').insertAdjacentHTML('beforeend', result[i] +  '\n'); // afterbegin
+}
+  } else {
+   alert('error', response.status);
+ }
+}
+
+
+async function refreshMessage() {
+  let response = await fetch('refreshPage', {method: 'GET'});
+
+  if (response.ok) {
+    //alert('Успешный GET', response.status);
+    let result = await response.json();
+    document.getElementById('messagePlace').textContent = "";
+    for (var i = 0; i < result.length; i++) {
+       document.getElementById('messagePlace').insertAdjacentHTML('beforeend', result[i] +  '\n'); // afterbegin
+}
+  } else {
+   alert('Ошибка обновления чата', response.status);
+ }
+}
+let timerId = setInterval(() => refreshMessage(), 1000);
+
+</script>
+
+<style>
+.lead{
+    border: 2px solid black;
+    padding: 5px; /* Расстояние от текста до рамки */
+}
+
+.title{
+    align: center;
+
+}
+.buttonSend {
+    display:block;
+    position: relative;
+    margin:0 auto;
+}
+
+.lead{
+    overflow: auto; /* Полоса прокрутки при необходимости */
+    padding: 10px; /* Поля вокруг текста */
+    max-height: 300px; /* Максимальная высота */
+    //background: #ffe; /* Цвет фона */
+    //border: 1px solid #cb2027; /* Параметры рамки */
+    white-space: pre-line;
+}
+</style>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="https://static.pingendo.com/bootstrap/bootstrap-4.3.1.css">
+  <title></title>
+</head>
+
+<body class="text-body">
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="display-1 text-center shadow-sm align-items-center">Чат</h1>
+            <p><input type="text" id="name" placeholder="Введите ваше имя"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5" style="">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5 border-primary">
+    <div class="container">
+      <div class="row">
+        <div class="scroll">
+            <p class="title" ><center>История сообщений</center></p>
+          <p class="lead" id="messagePlace">
+            {% for message in infoMessage %}
+              {{ message }}
+            {% endfor %}
+          </p>
+        </div>
+        <div class="col-md-4">
+            <p class="title" ><center>Сообщение</center></p>
+          <p class="lead" id="message" contenteditable="true"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5 text-center text-capitalize" style="" >
+    <div class="container">
+      <div class="row">
+            <input type="button" class="buttonSend" value="Отправить сообщение"  onClick='sendMessage()'>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
